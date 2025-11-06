@@ -12,18 +12,16 @@ permissions:
 
 jobs:
   review:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: read
+      pull-requests: write
     env:
       python_version: 3.13.5
       uv_version: 0.8.12
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          
       - name: Setup Python, uv and Dependencies
         uses: 9fin/gha-python/setup-python-uv@v1
         with:
