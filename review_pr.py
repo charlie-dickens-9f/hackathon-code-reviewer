@@ -80,7 +80,7 @@ CODE DIFF:
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": CONTENT_PROMPT}
         ],
-        max_completion_tokens=1500,
+        max_completion_tokens=3000,
     )
     
     return response.choices[0].message.content
