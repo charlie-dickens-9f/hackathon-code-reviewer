@@ -61,13 +61,13 @@ Be concise and actionable."""
     
     print("Requesting AI review...")
     response = client.chat.completions.create(
-        model="gpt-5-nano",
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "You are an expert Python code reviewer."},
             {"role": "user", "content": prompt}
         ],
         temperature=0.3,
-        max_tokens=1500,
+        max_completion_tokens=1500,
     )
     
     return response.choices[0].message.content
