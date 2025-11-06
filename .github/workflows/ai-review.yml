@@ -22,12 +22,21 @@ jobs:
       uv_version: 0.8.12
     
     steps:
-      - name: Setup Python, uv and Dependencies
-        uses: 9fin/gha-python/setup-python-uv@v1
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python_version: ${{ env.python_version }}
-          uv_version: ${{ env.uv_version }}
-          install_dev_dependencies: false
+          python-version: ${{ env.python_version }}
+          
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: ${{ env.uv_version }}
+          
+      - name: Install dependencies
+        run: uv pip install --system openai requests
           
       - name: Run AI Review
         env:
