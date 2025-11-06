@@ -6,6 +6,9 @@ import sys
 import requests
 from openai import OpenAI
 
+SYSTEM_PROMPT = """You are a senior Python engineer and an expert code reviewer. You follow PEP 8 style guidelines and Python best practices."""
+
+
 
 def get_env_var(name: str) -> str:
     """Get required environment variable or exit"""
@@ -47,27 +50,37 @@ def get_ai_review(diff: str, api_key: str) -> str:
     """Get AI code review from OpenAI"""
     client = OpenAI(api_key=api_key)
     
-    prompt = f"""Review this Python code diff and provide:
-1. Overall quality rating (A-F)
-2. Key issues in style, functionality, and security
-3. Specific recommendations
+    CONTENT_PROMPT = f"""When provided with a pull request diff, you will perform a thorough code review focusing on:  
+- Code readability and maintainability  
+- Performance and efficiency  
+- Security and potential vulnerabilities  
+- Style compliance (PEP 8 and project conventions)  
+- Correctness and logic errors  
 
+Provide feedback in a structured, clear manner. For each issue you find, identify the problematic code (with line numbers or context), explain why it might be an issue, and **suggest a concrete improvement** or solution. If certain categories have no issues, you may note that. Always be **constructive, concise, and professional** in tone.
+
+Organize your review in sections, for example:  
+1. **Summary of Changes:** Briefly summarize what the code change does.  
+2. **Issues Found:** For each area (readability, performance, security, style, correctness), list any problems or improvements, each with an explanation. Use bullet points for clarity.  
+3. **Suggestions for Improvement:** Provide actionable recommendations or code snippets for the issues above (you can combine this with the issues if appropriate, by giving the suggestion right after each issue’s explanation).  
+4. **Overall Assessment:** Conclude with a short evaluation of the code’s overall quality and whether it meets standards.
+5. **Grading:** Provide a letter grade (A-F) for the overall code quality regarding the code's readiness for production.
+
+**User Message (Code Diff Input):**  
 CODE DIFF:
 ```diff
-{diff[:10000]}
+{diff[:10000]}  
 ```
-
-Be concise and actionable."""
+    """
     
     print("Requesting AI review...")
     response = client.chat.completions.create(
         model="gpt-5-nano",
         messages=[
-            {"role": "system", "content": "You are an expert Python code reviewer."},
-            {"role": "user", "content": prompt}
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": CONTENT_PROMPT}
         ],
-        temperature=0.3,
-        max_tokens=1500,
+        max_completion_tokens=3000,
     )
     
     return response.choices[0].message.content

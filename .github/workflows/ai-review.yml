@@ -12,8 +12,11 @@ permissions:
 
 jobs:
   review:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: read
+      pull-requests: write
     env:
       python_version: 3.13.5
       uv_version: 0.8.12
@@ -21,15 +24,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          fetch-depth: 0
+          python-version: ${{ env.python_version }}
           
-      - name: Setup Python, uv and Dependencies
-        uses: 9fin/gha-python/setup-python-uv@v1
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
         with:
-          python_version: ${{ env.python_version }}
-          uv_version: ${{ env.uv_version }}
-          install_dev_dependencies: false
+          version: ${{ env.uv_version }}
+          
+      - name: Install dependencies
+        run: uv pip install --system openai requests
           
       - name: Run AI Review
         env:
